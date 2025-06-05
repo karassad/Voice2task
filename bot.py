@@ -8,6 +8,7 @@ from handlers.start_handler import start, handle_button
 from telegram.ext import CallbackQueryHandler
 
 
+
 """
 Главная точка входа для Telegram-бота.
 Инициализирует бота, подключает обработчики команд, сообщений и кнопок.
