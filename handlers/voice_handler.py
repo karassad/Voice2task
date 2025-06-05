@@ -1,7 +1,10 @@
+import json
+
 from telegram import Update, Voice
 from telegram.ext import ContextTypes
 from utils.transcriber import transcribe_audio
 from utils.audio import convert_ogg_to_wav
+from utils.gpt_parser import parse_task_to_event
 
 
 """
@@ -25,3 +28,10 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = transcribe_audio("voice.wav")
 
     await  update.message.reply_text(f"Распознанный текст:\n{text}")
+
+    try:
+        event = parse_task_to_event(text) #получчаем питон словарь
+        formatted = json.dumps(event, indent=2, ensure_ascii=False) #преобразует его в отформатированную JSON-строку
+        await update.message.reply_text(f"📅 Задача из текста:\n<pre>{formatted}</pre>", parse_mode="HTML")
+    except Exception as e:
+        await update.message.reply_text("Ошибка при создании структуры события.")
