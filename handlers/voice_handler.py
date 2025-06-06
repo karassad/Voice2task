@@ -2,6 +2,8 @@ import json
 
 from telegram import Update, Voice
 from telegram.ext import ContextTypes
+
+from utils.calendar import create_event
 from utils.transcriber import transcribe_audio
 from utils.audio import convert_ogg_to_wav
 from utils.gpt_parser import parse_task_to_event
@@ -32,6 +34,16 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         event = parse_task_to_event(text) #получчаем питон словарь
         formatted = json.dumps(event, indent=2, ensure_ascii=False) #преобразует его в отформатированную JSON-строку
-        await update.message.reply_text(f"📅 Задача из текста:\n<pre>{formatted}</pre>", parse_mode="HTML")
+        #Добавляем в Google Calendar
+        print("📦 Event object:", event)
+        link = create_event(event)
+
+        await update.message.reply_text(
+            f"📅 Задача из текста:\n<pre>{formatted}</pre>\n\n✅ Добавлено в календарь:\n{link}",
+            parse_mode="HTML"
+        )
+
     except Exception as e:
-        await update.message.reply_text("Ошибка при создании структуры события.")
+        import traceback
+        traceback.print_exc()  # покажет ошибку в консоли
+        await update.message.reply_text("Ошибка при создании события.")
