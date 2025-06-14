@@ -5,6 +5,7 @@ import os
 from tg_bot.config import TOKENS_DIR
 
 app = FastAPI() #приложение апи
+print("✅ FastAPI app instance создан")
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"] #разрешение на добавленрие в календарь
 CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
@@ -12,6 +13,7 @@ CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
 #обработка GET-запросов
 @app.get("/oauth2callback")
 async def oauth2callback(request: Request):
+    print("FastAPI успешно запущен")
     try:
         user_id = request.query_params.get("state") #пользователь
         code = request.query_params.get('code') #код для получения токена
