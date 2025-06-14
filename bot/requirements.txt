@@ -1,0 +1,7 @@
+# Список зависимостей проекта
+# Устанавливаются через: pip install -r requirements.txt
+
+#cmd
+#cd %LOCALAPPDATA%\Programs\Ollama
+#ollama.exe serve
+#ollama run mistral
