@@ -36,6 +36,7 @@ async def oauth2callback(request: Request):
         token_file.write(creds.to_json())
 
     print(f"Токен сохранён: {token_path}")
+
     return {"message": "Авторизация успешна. Можно вернуться в Telegram-бот."}
 
 
