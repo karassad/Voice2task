@@ -31,6 +31,8 @@ async def oauth2callback(request: Request):
 
     os.makedirs(TOKENS_DIR, exist_ok=True)
     token_path = os.path.join(TOKENS_DIR, f"token_{user_id}.json")
+    print("👉 TOKENS_DIR =", TOKENS_DIR)
+    print("👉 DIR EXISTS:", os.path.exists(TOKENS_DIR))
 
     with open(token_path, "w") as token_file:
         token_file.write(creds.to_json())
