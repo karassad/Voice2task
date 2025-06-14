@@ -1,2 +1,5 @@
-# Список зависимостей проекта
-# Устанавливаются через: pip install -r requirements.txt
+fastapi
+uvicorn #ASGI-сервер для запуска FastAPI
+google-auth
+google-auth-oauthlib #Google OAuth 2.0 Flow
+python-multipart #Нужно для парсинга тела запроса

@@ -21,22 +21,20 @@ def extract_json_from_response(text: str) -> dict:
         print(text)
         raise e
 
+
 def parse_task_to_event(text: str) -> str:
     """
     Отправляет текст в локальную LLM (через Ollama) и получает структуру события в JSON-формате.
     """
-
+    print("GPT INPUT:", text)
     today_str = datetime.today().strftime('%Y-%m-%d')
 
     prompt = f"""
-    Сегодняшняя дата: {today_str}
-    Из этого текста создай структуру события для календаря в формате JSON 
-    (не добавляй никаких пояснений или комментариев внутри JSON):
-    Время указывай в локальной зоне (Москва).
+    Сегодня {today_str}.
 
-    "{text}"
+    Из следующего текста создай событие в календаре. Ответ ДОЛЖЕН быть только в виде JSON, без пояснений. Не пиши ничего, кроме JSON.
 
-    Формат:
+    Пример:
     {{
       "title": "Название события",
       "start": "2025-06-05T15:00:00",
@@ -44,7 +42,12 @@ def parse_task_to_event(text: str) -> str:
       "description": "по желанию",
       "reminder_minutes": 10
     }}
+
+    Вот текст задачи:
+    {text}
     """
+
+    print("Отправляем запрос в Ollama...")
 
     response = requests.post(
         "http://localhost:11434/api/chat",
@@ -53,7 +56,8 @@ def parse_task_to_event(text: str) -> str:
             "messages": [{"role": "user", "content": prompt}],
             "stream": False,
             "temperature": 0.3
-        }
+        },
+        timeout=120
     )
 
     print("RAW RESPONSE:")
