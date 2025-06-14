@@ -7,7 +7,7 @@ from tg_bot.config import TOKENS_DIR
 app = FastAPI() #приложение апи
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"] #разрешение на добавленрие в календарь
-CLIENT_SECRET_FILE = "credentials.json" #OAuth 2.0
+CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
 
 #обработка GET-запросов
 @app.get("/oauth2callback")
