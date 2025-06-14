@@ -1,0 +1,4 @@
+# Ignore secret files
+*.json
+!credentials.json
+tg_bot/tokens/
