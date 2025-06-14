@@ -4,11 +4,12 @@ import os.path
 from telegram import Update, Voice
 from telegram.ext import ContextTypes
 
-from bot.utils.calendar import create_event
-from bot.utils.transcriber import transcribe_audio
-from bot.utils.audio import convert_ogg_to_wav
-from bot.utils.gpt_parser import parse_task_to_event
-from bot.utils.oauth import generate_google_auth_url
+from tg_bot.utils.calendar import create_event
+from tg_bot.utils.transcriber import transcribe_audio
+from tg_bot.utils.audio import convert_ogg_to_wav
+from tg_bot.utils.gpt_parser import parse_task_to_event
+from tg_bot.utils.oauth import generate_google_auth_url
+from tg_bot.config import TOKENS_DIR
 
 
 RAILWAY_DOMAIN = "https://web-production-25e89.up.railway.app"
@@ -23,7 +24,8 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"Update data: {update}")
 
     user_id = update.effective_user.id
-    token_path = f'tokens/token_{user_id}.json'
+    # token_path = f'tokens/token_{user_id}.json'
+    token_path = os.path.join(TOKENS_DIR, f"token_{user_id}.json")
 
     print(f"user_id = {user_id}")
     print(f"Проверяем наличие токена: {token_path}")
