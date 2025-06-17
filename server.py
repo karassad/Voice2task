@@ -5,8 +5,18 @@ import subprocess
 def start_api():
     uvicorn.run("auth.main:app", host="0.0.0.0", port=8080)
 
+import subprocess
+
 def start_bot():
-    subprocess.run(["python", "-m", "tg_bot.bot"])  # ✅ запуск bot.py как модуля
+    print("📦 Запускаем Telegram-бота...")
+    result = subprocess.run(
+        ["python", "-m", "tg_bot.bot"],
+        capture_output=True,
+        text=True
+    )
+    print("🔚 Бот завершился.")
+    print("stdout:\n", result.stdout)
+    print("stderr:\n", result.stderr)
 
 if __name__ == "__main__":
     p1 = Process(target=start_api)
