@@ -1,6 +1,8 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request #FastAPI фреймворк для создания HTTP API-серверов
 from google_auth_oauthlib.flow import Flow #объект от Google, который помогает провести OAuth 2.0 авторизацию.
 import os
+load_dotenv()
 
 from tg_bot.config import TOKENS_DIR
 
