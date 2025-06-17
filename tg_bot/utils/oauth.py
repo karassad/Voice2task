@@ -18,7 +18,7 @@ def generate_google_auth_url(user_id: int) -> str:
     """
 
     flow = Flow.from_client_secrets_file(
-        "credentials.json",  # файл, в котором лежат client_id, client_secret и redirect_uri
+        "auth/credentials.json",  # файл, в котором лежат client_id, client_secret и redirect_uri
         scopes=SCOPES,
         redirect_uri = RAILWAY_REDIRECT
     )
