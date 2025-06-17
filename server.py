@@ -1,3 +1,4 @@
+import os
 from multiprocessing import Process
 import uvicorn
 import subprocess
