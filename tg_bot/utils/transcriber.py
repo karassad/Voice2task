@@ -1,4 +1,4 @@
-import whisper
+
 import os
 from faster_whisper import WhisperModel
 
