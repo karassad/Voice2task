@@ -4,3 +4,4 @@ google-auth
 google-auth-oauthlib #Google OAuth 2.0 Flow
 python-multipart #Нужно для парсинга тела запроса
 python-dotenv
+python-telegram-bot==20.6
