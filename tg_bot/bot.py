@@ -7,7 +7,7 @@ from handlers.voice_handler import handle_voice
 from handlers.start_handler import start, handle_button
 from telegram.ext import CallbackQueryHandler
 
-
+print("Бот запущен...")
 
 
 
@@ -24,5 +24,6 @@ app.add_handler(CallbackQueryHandler(handle_button)) #обработка наж�
 
 
 
-print("Бот запущен...")
+
+print("▶️ Бот запускается (polling)")
 app.run_polling() #Это основной цикл работы бота
