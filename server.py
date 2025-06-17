@@ -9,8 +9,12 @@ import subprocess
 
 def start_bot():
     print("📦 Запускаем Telegram-бота...")
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "."  # корень проекта
+
     result = subprocess.run(
         ["python", "tg_bot/bot.py"],
+        env=env,
         capture_output=True,
         text=True
     )
