@@ -1,12 +1,12 @@
-# server.py
 from multiprocessing import Process
 import uvicorn
+import subprocess
 
 def start_api():
     uvicorn.run("auth.main:app", host="0.0.0.0", port=8080)
 
 def start_bot():
-    import bot  # это выполнит bot.py (где app.run_polling)
+    subprocess.run(["python", "-m", "tg_bot.bot"])  # ✅ запуск bot.py как модуля
 
 if __name__ == "__main__":
     p1 = Process(target=start_api)
