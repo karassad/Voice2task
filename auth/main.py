@@ -24,6 +24,15 @@ async def oauth2callback(request: Request):
         print(f"user_id = {user_id}")
         print(f"code = {code}")
 
+
+        if not user_id or not code:
+            print("❌ Не получены параметры 'state' или 'code'")
+            return {"error": "missing parameters"}
+
+        print(f"👉 CLIENT_SECRET_FILE = {CLIENT_SECRET_FILE}")
+        print(f"👉 REDIRECT_URL = {os.getenv('REDIRECT_URL')}")
+        print(f"👉 SCOPES = {SCOPES}")
+
         flow = Flow.from_client_secrets_file( #читает credentials.json
             CLIENT_SECRET_FILE,
             scopes=SCOPES,
