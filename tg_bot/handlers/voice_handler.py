@@ -48,6 +48,8 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             import traceback
+            print("❌ Ошибка при генерации OAuth-ссылки:")
+            print(f"user_id = {user_id}")
             traceback.print_exc()
             await update.message.reply_text("❌ Ошибка при генерации ссылки авторизации.")
         return
