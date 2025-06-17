@@ -10,7 +10,7 @@ import subprocess
 def start_bot():
     print("📦 Запускаем Telegram-бота...")
     result = subprocess.run(
-        ["python", "-m", "tg_bot.bot"],
+        ["python", "tg_bot/bot.py"],
         capture_output=True,
         text=True
     )
