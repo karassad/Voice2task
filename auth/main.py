@@ -33,6 +33,8 @@ async def oauth2callback(request: Request):
         print(f"👉 REDIRECT_URL = {os.getenv('REDIRECT_URL')}")
         print(f"👉 SCOPES = {SCOPES}")
 
+
+
         flow = Flow.from_client_secrets_file( #читает credentials.json
             CLIENT_SECRET_FILE,
             scopes=SCOPES,
