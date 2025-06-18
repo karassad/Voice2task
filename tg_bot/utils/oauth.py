@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 from google_auth_oauthlib.flow import Flow
 load_dotenv()
 
-RAILWAY_REDIRECT = os.getenv("REDIRECT_URL", "https://web-production-25e89.up.railway.app/oauth2callback")
+RAILWAY_REDIRECT = os.getenv("REDIRECT_URL")
+if not RAILWAY_REDIRECT:
+    raise ValueError("REDIRECT_URL не задан в переменных окружения!")
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
 def generate_google_auth_url(user_id: int) -> str:
