@@ -17,6 +17,8 @@ def generate_google_auth_url(user_id: int) -> str:
            str: Ссылка на страницу авторизации Google (user -> browser)
     """
 
+    print(f"REDIRECT_URL = {RAILWAY_REDIRECT}")
+
     flow = Flow.from_client_secrets_file(
         "auth/credentials.json",  # файл, в котором лежат client_id, client_secret и redirect_uri
         scopes=SCOPES,
