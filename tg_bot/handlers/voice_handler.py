@@ -4,12 +4,14 @@ import os.path
 from telegram import Update, Voice
 from telegram.ext import ContextTypes
 
-from tg_bot.utils.calendar import create_event
 from tg_bot.utils.transcriber import transcribe_audio
 from tg_bot.utils.audio import convert_ogg_to_wav
 from tg_bot.utils.gpt_parser import parse_task_to_event
 from tg_bot.utils.oauth import generate_google_auth_url
 from tg_bot.config import TOKENS_DIR
+
+from calendar_client import GoogleCalendar
+
 
 
 RAILWAY_DOMAIN = "https://web-production-25e89.up.railway.app"
@@ -71,7 +73,10 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         formatted = json.dumps(event, indent=2, ensure_ascii=False) #преобразует его в отформатированную JSON-строку
         #Добавляем в Google Calendar
         print("📦 Event object:", event)
-        link = create_event(event, user_id)
+        # link = create_event(event, user_id)
+        calendar = GoogleCalendar(user_id)
+        created_event = calendar.add_event_to_primary(event)
+        link = created_event.get('htmlLink')
 
         await update.message.reply_text(
             f"📅 Задача из текста:\n<pre>{formatted}</pre>\n\n✅ Добавлено в календарь:\n{link}",
