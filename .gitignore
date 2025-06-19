@@ -2,3 +2,4 @@
 *.json
 credentials.json
 tg_bot/tokens/
+.env
