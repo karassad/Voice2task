@@ -9,9 +9,9 @@ def start_api():
 import subprocess
 
 def start_bot():
-    print("📦 Запускаем Telegram-бота...")
+    print("Запускаем Telegram-бота...")
     env = os.environ.copy()
-    env["PYTHONPATH"] = "."  # корень проекта
+    env["PYTHONPATH"] = "."  #корень проекта
 
     result = subprocess.run(
         ["python", "tg_bot/bot.py"],
@@ -19,7 +19,7 @@ def start_bot():
         capture_output=True,
         text=True
     )
-    print("🔚 Бот завершился.")
+    print("Бот завершился.")
     print("stdout:\n", result.stdout)
     print("stderr:\n", result.stderr)
 

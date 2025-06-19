@@ -9,7 +9,7 @@ from tg_bot.config import TOKENS_DIR
 app = FastAPI() #приложение апи
 print("✅ FastAPI app instance создан")
 
-SCOPES = ["https://www.googleapis.com/auth/calendar.events"] #разрешение на добавленрие в календарь
+SCOPES = ["https://www.googleapis.com/auth/calendar"] #разрешение на добавленрие в календарь
 CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
 
 #обработка GET-запросов
@@ -26,7 +26,7 @@ async def oauth2callback(request: Request):
 
 
         if not user_id or not code:
-            print("❌ Не получены параметры 'state' или 'code'")
+            print("Не получены параметры 'state' или 'code'")
             return {"error": "missing parameters"}
 
         print(f"👉 CLIENT_SECRET_FILE = {CLIENT_SECRET_FILE}")

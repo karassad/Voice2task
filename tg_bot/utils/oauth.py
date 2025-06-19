@@ -7,7 +7,7 @@ load_dotenv()
 RAILWAY_REDIRECT = os.getenv("REDIRECT_URL")
 if not RAILWAY_REDIRECT:
     raise ValueError("REDIRECT_URL не задан в переменных окружения!")
-SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def generate_google_auth_url(user_id: int) -> str:
     """
