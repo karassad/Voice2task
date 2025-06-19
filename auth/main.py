@@ -37,7 +37,7 @@ async def oauth2callback(request: Request):
         print(f"👉 SCOPES = {SCOPES}")
 
         flow = Flow.from_client_secrets_file( #читает credentials.json
-            creds_dict['web'],
+            client_config=creds_dict['web'],
             scopes=SCOPES,
             redirect_uri=os.getenv("REDIRECT_URL") #куда Google вернёт пользователя после входа
         )
