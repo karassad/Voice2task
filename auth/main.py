@@ -1,3 +1,5 @@
+import json
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request #FastAPI фреймворк для создания HTTP API-серверов
 from google_auth_oauthlib.flow import Flow #объект от Google, который помогает провести OAuth 2.0 авторизацию.
@@ -10,7 +12,9 @@ app = FastAPI() #приложение апи
 print("✅ FastAPI app instance создан")
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"] #разрешение на добавленрие в календарь
-CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
+# CLIENT_SECRET_FILE = "auth/credentials.json" #OAuth 2.0
+GOOGLE_CREDS = os.getenv("GOOGLE_CREDENTIALS_JSON")
+creds_dict = json.loads(GOOGLE_CREDS)
 
 #обработка GET-запросов
 @app.get("/oauth2callback")
@@ -29,14 +33,13 @@ async def oauth2callback(request: Request):
             print("Не получены параметры 'state' или 'code'")
             return {"error": "missing parameters"}
 
-        print(f"👉 CLIENT_SECRET_FILE = {CLIENT_SECRET_FILE}")
         print(f"👉 REDIRECT_URL = {os.getenv('REDIRECT_URL')}")
         print(f"👉 SCOPES = {SCOPES}")
 
 
 
         flow = Flow.from_client_secrets_file( #читает credentials.json
-            CLIENT_SECRET_FILE,
+            client_config=creds_dict,
             scopes=SCOPES,
             redirect_uri=os.getenv("REDIRECT_URL") #куда Google вернёт пользователя после входа
         )

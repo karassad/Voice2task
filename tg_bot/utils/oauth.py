@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -8,6 +9,9 @@ RAILWAY_REDIRECT = os.getenv("REDIRECT_URL")
 if not RAILWAY_REDIRECT:
     raise ValueError("REDIRECT_URL не задан в переменных окружения!")
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+GOOGLE_CREDS = os.getenv("GOOGLE_CREDENTIALS_JSON")
+creds_dict = json.loads(GOOGLE_CREDS)
 
 def generate_google_auth_url(user_id: int) -> str:
     """
@@ -22,7 +26,7 @@ def generate_google_auth_url(user_id: int) -> str:
     print(f"REDIRECT_URL = {RAILWAY_REDIRECT}")
 
     flow = Flow.from_client_secrets_file(
-        "auth/credentials.json",  # файл, в котором лежат client_id, client_secret и redirect_uri
+        client_config=creds_dict,  # файл, в котором лежат client_id, client_secret и redirect_uri
         scopes=SCOPES,
         redirect_uri = RAILWAY_REDIRECT
     )
