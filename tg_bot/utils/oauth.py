@@ -26,7 +26,7 @@ def generate_google_auth_url(user_id: int) -> str:
     print(f"REDIRECT_URL = {RAILWAY_REDIRECT}")
 
     flow = Flow.from_client_secrets_file(
-        client_config=creds_dict,  # файл, в котором лежат client_id, client_secret и redirect_uri
+        creds_dict['web'],  # файл, в котором лежат client_id, client_secret и redirect_uri
         scopes=SCOPES,
         redirect_uri = RAILWAY_REDIRECT
     )
