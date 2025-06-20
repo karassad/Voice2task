@@ -11,7 +11,7 @@ from tg_bot.config import TOKENS_DIR
 load_dotenv()
 
 # настройка логирования
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()  # приложение апи

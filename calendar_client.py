@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 from tg_bot.config import TOKENS_DIR
 
 # настройка логов
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
