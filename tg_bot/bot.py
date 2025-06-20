@@ -25,5 +25,6 @@ app.add_handler(CallbackQueryHandler(handle_button)) #обработка наж�
 
 
 
-print("▶️ Бот запускается (polling)")
-app.run_polling() #Это основной цикл работы бота
+if __name__ == "__main__":
+    print("▶️ Бот запускается (polling)")
+    app.run_polling()
