@@ -2,8 +2,8 @@ from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, fil
 from telegram import Update
 
 from tg_bot.config import BOT_TOKEN
-from handlers.start_handler import start, handle_button
-from handlers.voice_handler import handle_voice
+from tg_bot.handlers.start_handler import start, handle_button
+from tg_bot.handlers.voice_handler import handle_voice
 
 from telegram.ext import CallbackQueryHandler
 
