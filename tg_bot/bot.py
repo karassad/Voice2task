@@ -1,7 +1,7 @@
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
 from telegram import Update
 
-from config import BOT_TOKEN
+from tg_bot.config import BOT_TOKEN
 from handlers.start_handler import start, handle_button
 from handlers.voice_handler import handle_voice
 
