@@ -29,20 +29,23 @@ def start_bot():
     env = os.environ.copy()
     env["PYTHONPATH"] = "."
 
-    process = subprocess.Popen(
-        ["python", "tg_bot/bot.py"],
-        env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    try:
+        process = subprocess.Popen(
+            ["python", "tg_bot/bot.py"],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
 
-    # Потоки для чтения stdout/stderr
-    threading.Thread(target=stream_output, args=(process.stdout, logging.INFO), daemon=True).start()
-    threading.Thread(target=stream_output, args=(process.stderr, logging.ERROR), daemon=True).start()
+        threading.Thread(target=stream_output, args=(process.stdout, logging.INFO), daemon=True).start()
+        threading.Thread(target=stream_output, args=(process.stderr, logging.ERROR), daemon=True).start()
 
-    process.wait()
-    logger.info("⛔ Бот завершился.")
+        process.wait()
+        logger.info("⛔ Бот завершился.")
+    except Exception as e:
+        logger.exception("❌ Ошибка при запуске бота:")
+
 
 if __name__ == "__main__":
     logger.info("📦 Запуск приложения с двумя процессами (API + BOT)")
