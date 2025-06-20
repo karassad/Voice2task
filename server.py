@@ -30,6 +30,7 @@ def start_bot():
     env["PYTHONPATH"] = "."
 
     try:
+        logger.info("✅ Готовимся запускать bot.py через subprocess")
         process = subprocess.Popen(
             ["python", "tg_bot/bot.py"],
             env=env,
