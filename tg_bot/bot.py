@@ -5,11 +5,7 @@ from config import BOT_TOKEN
 from handlers.start_handler import start, handle_button
 from handlers.voice_handler import handle_voice
 
-
 from telegram.ext import CallbackQueryHandler
-
-print("Бот запущен...")
-
 
 
 """
@@ -17,16 +13,13 @@ print("Бот запущен...")
 Инициализирует бота, подключает обработчики команд, сообщений и кнопок.
 """
 
-app = ApplicationBuilder().token(BOT_TOKEN).build()
+def start_bot():
+    print("Бот запущен...")
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.VOICE, handle_voice))
-app.add_handler(CallbackQueryHandler(handle_button)) #обработка нажатия на inline-кнопки
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    app.add_handler(CallbackQueryHandler(handle_button))
 
-
-
-
-if __name__ == "__main__":
     print("▶️ Бот запускается (polling)")
-    # app.run_polling()
     app.run_polling(drop_pending_updates=True)
