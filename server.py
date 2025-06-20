@@ -4,6 +4,7 @@ import sys
 from multiprocessing import Process
 import subprocess
 import uvicorn
+import threading
 
 logging.basicConfig(
     level=logging.INFO,  # или DEBUG если нужно
@@ -12,30 +13,36 @@ logging.basicConfig(
 )
 
 # настройка логов
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def start_api():
     logger.info("🚀 Запускаем FastAPI сервер на 0.0.0.0:8080")
     uvicorn.run("auth.main:app", host="0.0.0.0", port=8080)
 
+def stream_output(pipe, level):
+    for line in iter(pipe.readline, ''):
+        if line:
+            logger.log(level, line.strip())
+
 def start_bot():
     logger.info("🤖 Запускаем Telegram-бота...")
     env = os.environ.copy()
-    env["PYTHONPATH"] = "."  # корень проекта
+    env["PYTHONPATH"] = "."
 
-    result = subprocess.run(
+    process = subprocess.Popen(
         ["python", "tg_bot/bot.py"],
         env=env,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True
     )
 
+    # Потоки для чтения stdout/stderr
+    threading.Thread(target=stream_output, args=(process.stdout, logging.INFO), daemon=True).start()
+    threading.Thread(target=stream_output, args=(process.stderr, logging.ERROR), daemon=True).start()
+
+    process.wait()
     logger.info("⛔ Бот завершился.")
-    if result.stdout:
-        logger.info("📤 STDOUT:\n%s", result.stdout)
-    if result.stderr:
-        logger.error("📥 STDERR:\n%s", result.stderr)
 
 if __name__ == "__main__":
     logger.info("📦 Запуск приложения с двумя процессами (API + BOT)")
