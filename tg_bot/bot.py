@@ -2,9 +2,8 @@ from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, fil
 from telegram import Update
 
 from config import BOT_TOKEN
-from handlers.start_handler import start
-from handlers.voice_handler import handle_voice
 from handlers.start_handler import start, handle_button
+
 from telegram.ext import CallbackQueryHandler
 
 print("Бот запущен...")
