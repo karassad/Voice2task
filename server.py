@@ -5,6 +5,7 @@ from multiprocessing import Process
 import subprocess
 import uvicorn
 import threading
+from tg_bot.bot import start_bot
 
 logging.basicConfig(
     level=logging.INFO,  # или DEBUG если нужно
@@ -24,34 +25,38 @@ def stream_output(pipe, level):
         if line:
             logger.log(level, line.strip())
 
-def start_bot():
+# def start_bot():
+#     logger.info("🤖 Запускаем Telegram-бота...")
+#     env = os.environ.copy()
+#     env["PYTHONPATH"] = "."
+
+def start_bot_process():
     logger.info("🤖 Запускаем Telegram-бота...")
-    env = os.environ.copy()
-    env["PYTHONPATH"] = "."
+    start_bot()
 
-    try:
-        logger.info("✅ Готовимся запускать bot.py через subprocess")
-        process = subprocess.Popen(
-            ["python", "tg_bot/bot.py"],
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-
-        threading.Thread(target=stream_output, args=(process.stdout, logging.INFO), daemon=True).start()
-        threading.Thread(target=stream_output, args=(process.stderr, logging.ERROR), daemon=True).start()
-
-        process.wait()
-        logger.info("⛔ Бот завершился.")
-    except Exception as e:
-        logger.exception("❌ Ошибка при запуске бота:")
+    # try:
+    #     logger.info("✅ Готовимся запускать bot.py через subprocess")
+    #     process = subprocess.Popen(
+    #         ["python", "tg_bot/bot.py"],
+    #         env=env,
+    #         stdout=subprocess.PIPE,
+    #         stderr=subprocess.PIPE,
+    #         text=True
+    #     )
+    #
+    #     threading.Thread(target=stream_output, args=(process.stdout, logging.INFO), daemon=True).start()
+    #     threading.Thread(target=stream_output, args=(process.stderr, logging.ERROR), daemon=True).start()
+    #
+    #     process.wait()
+    #     logger.info("⛔ Бот завершился.")
+    # except Exception as e:
+    #     logger.exception("❌ Ошибка при запуске бота:")
 
 
 if __name__ == "__main__":
     logger.info("📦 Запуск приложения с двумя процессами (API + BOT)")
     p1 = Process(target=start_api)
-    p2 = Process(target=start_bot)
+    p2 = Process(target=start_bot_process)
     p1.start()
     p2.start()
     p1.join()
