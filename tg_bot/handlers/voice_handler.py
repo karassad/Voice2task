@@ -14,7 +14,7 @@ from tg_bot.config import TOKENS_DIR
 from calendar_client import GoogleCalendar
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 RAILWAY_DOMAIN = "https://web-production-25e89.up.railway.app"
 
@@ -42,6 +42,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(
                 f"Чтобы я мог сохранить задачу в твой Google Календарь, перейди по ссылке и авторизуйся:\n{auth_url}"
             )
+
         except Exception:
             logger.exception(f"❌ Ошибка при генерации OAuth-ссылки (user_id={user_id}):")
             await update.message.reply_text("❌ Ошибка при генерации ссылки авторизации.")

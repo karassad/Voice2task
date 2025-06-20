@@ -1,8 +1,15 @@
 import os
 import logging
+import sys
 from multiprocessing import Process
 import subprocess
 import uvicorn
+
+logging.basicConfig(
+    level=logging.INFO,  # или DEBUG если нужно
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 # настройка логов
 logging.basicConfig(level=logging.INFO)
