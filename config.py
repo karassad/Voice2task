@@ -3,6 +3,10 @@
 
 Хранит настройки, например, токен Telegram-бота.
 """
+from dotenv import load_dotenv
 
-
-BOT_TOKEN = '7639182471:AAEgPZ0GEdnGMd7EYlXH0jc7CSUUobXgGZE'
+load_dotenv()
+import os
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("❌ BOT_TOKEN не найден. Проверь .env файл или переменные окружения.")
