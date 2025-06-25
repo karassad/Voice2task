@@ -18,12 +18,12 @@ def get_calendar_service():
         flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
         creds = flow.run_local_server(port=8080)
 
-
         with open("token.json", "w") as token:
             token.write(creds.to_json()) #сохраняем токен в файл
 
     #Создаём объект service, через который можно делать запросы к Google Calendar API
     return build("calendar", "v3", credentials=creds)
+
 
 def get_calendar_list():
     '''
@@ -62,8 +62,6 @@ def create_event_in_calendar(calendar_id: str, event: dict) -> str:
 
     created_event = service.events().insert(calendarId=calendar_id, body=google_event).execute()
     return created_event.get('htmlLink')
-
-
 
 
 def create_event(event: dict) -> str:
