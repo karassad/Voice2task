@@ -8,6 +8,7 @@ import re #для работы с регулярными выражениями
 
 load_dotenv()
 
+
 client = OpenAI(api_key=os.getenv("OPEN_API_KEY"))
 
 def extract_json_from_response(text: str) -> dict:
