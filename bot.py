@@ -1,27 +1,46 @@
-from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
+from whisper import transcribe
 
-from config import BOT_TOKEN
-from handlers.voice_handler import handle_voice
+from config import BOT_TOKEN, GOOGLE_CREDS_PATH, GOOGLE_TOKEN_PATH, TIMEZONE
+
+from services.calendar_service import CalendarService
+from services.transcriber import Transcriber
+from services.gpt_parser import TaskParser
+from flow.event_flow import EventCreationFlow
 from handlers.start_handler import start, handle_button
-from telegram.ext import CallbackQueryHandler
-from utils.flow import EventCreationFlow
-
+from handlers.voice_handler import VoiceHandler
 
 """
 Главная точка входа для Telegram-бота.
 Инициализирует бота, подключает обработчики команд, сообщений и кнопок.
 """
 
-app = ApplicationBuilder().token(BOT_TOKEN).build()
+def build_bot():
+    #Инициализация сервисов
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.VOICE, handle_voice))
-# app.add_handler(CallbackQueryHandler(handle_button)) #обработка нажатия на inline-кнопки
-# app.add_handler(CallbackQueryHandler(EventCreationFlow.handle_calendar_selection))
-# Первый обрабатывает кнопки с callback_data, начинающейся на "start_" или другие команды
-app.add_handler(CallbackQueryHandler(handle_button, pattern=r"^(?!calendar_).*"))
-# Второй — только для календарей
-app.add_handler(CallbackQueryHandler(EventCreationFlow.handle_calendar_selection, pattern=r"^calendar_"))
+    #сервис для работы с Google Calendar API
+    calendar_service = CalendarService(GOOGLE_CREDS_PATH, GOOGLE_TOKEN_PATH, TIMEZONE)
+    #Модель faster-whisper, для распознавания речи
+    transcriber = Transcriber()
+    #Обёртка над LLM (Ollama), преобразует текст в JSON-событие
+    parser = TaskParser()
+    #Флоу сценария с выбором календаря. Работает поверх calendar_service
+    event_flow = EventCreationFlow(calendar_service)
+    #Главный обработчик голосовых сообщений — объединяет все предыдущие.
+    voice_handler = VoiceHandler(transcriber, parser, event_flow)
 
-print("Бот запущен...")
-app.run_polling() #Это основной цикл работы бота
+    # Инициализация Telegram-приложения
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    # Хендлеры
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.VOICE, voice_handler.handle_voice))
+    app.add_handler(CallbackQueryHandler(handle_button, pattern=r"^(?!calendar_).*"))  # не-календарные кнопки
+    app.add_handler(CallbackQueryHandler(event_flow.handle_calendar_selection, pattern=r"^calendar_"))  # календарные
+
+    return app
+
+if __name__ == "__main__":
+    app = build_bot()
+    print("🚀 Бот запущен...")
+    app.run_polling()

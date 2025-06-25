@@ -1,25 +1,23 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from utils.calendar import get_calendar_list, create_event_in_calendar
+from services.calendar_service import CalendarService
 
 
 class EventCreationFlow:
-    @staticmethod
-    async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, event: dict):
+
+    def __init__(self, calendar_service: CalendarService):
+        self.calendar_service = calendar_service
+
+    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE, event: dict):
         """
-            Инициирует процесс добавления события — показывает список календарей.
+            Запускает выбор календаря пользователю.
         """
-        calendars = get_calendar_list()
+        calendars = self.calendar_service.list_calendars()
+
         context.user_data['event'] = event  # Сохраняем event в словарь user_data, чтобы потом в
         # другом хендлере (по нажатию кнопки) мы могли его достать
         context.user_data['calendar_map'] = {} #сохраняем ID-шки календарей в коротком формате,
         # чтобы не выбрасовало ошибок из-за длины сообщения
-
-        # buttons = [
-        #     [InlineKeyboardButton(cal['summary'], callback_data=f"calendar_{cal['id']}")]
-        #     for cal in calendars
-        # ]
-
 
         buttons = []
         for idx, cal in enumerate(calendars): #enumerate() даёт нам пары (0, calendar1), (1, calendar2) и т.д.
@@ -32,8 +30,7 @@ class EventCreationFlow:
             reply_markup=InlineKeyboardMarkup(buttons)
         )
 
-    @staticmethod
-    async def handle_calendar_selection(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def handle_calendar_selection(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
             Обрабатывает нажатие на кнопку календаря.
         """
@@ -57,7 +54,7 @@ class EventCreationFlow:
             return
 
         try:
-            link = create_event_in_calendar(calendar_id, event)
+            link = self.calendar_service.create_event(calendar_id, event)
             await query.edit_message_text(
                 f"✅ Событие добавлено в календарь:\n{link}"
             )
