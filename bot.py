@@ -9,6 +9,7 @@ from services.gpt_parser import TaskParser
 from flow.event_flow import EventCreationFlow
 from handlers.start_handler import start, handle_button
 from handlers.voice_handler import VoiceHandler
+import asyncio
 
 """
 Главная точка входа для Telegram-бота.
@@ -30,7 +31,17 @@ def build_bot():
     voice_handler = VoiceHandler(transcriber, parser, event_flow)
 
     # Инициализация Telegram-приложения
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    # app = ApplicationBuilder().token(BOT_TOKEN).build()
+    from telegram.request import HTTPXRequest
+    app = (
+        ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .request(HTTPXRequest(connect_timeout=30, read_timeout=30))
+        .build()
+    )
+
+    # Сохраняем event_flow для использования в хендлерах кнопок
+    app.bot_data["event_flow"] = event_flow
 
     # Хендлеры
     app.add_handler(CommandHandler("start", start))
@@ -40,7 +51,16 @@ def build_bot():
 
     return app
 
+async def main():
+    app = build_bot()  # build_bot синхронный
+    print("🚀 Бот запущен...")
+    await app.initialize()
+    await app.start()
+    await app.run_polling()
+
+
 if __name__ == "__main__":
     app = build_bot()
     print("🚀 Бот запущен...")
     app.run_polling()
+

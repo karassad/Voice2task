@@ -1,6 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from services.calendar_service import CalendarService
+from handlers.start_handler import send_main_menu
+
 
 
 class EventCreationFlow:
@@ -22,13 +24,23 @@ class EventCreationFlow:
         buttons = []
         for idx, cal in enumerate(calendars): #enumerate() даёт нам пары (0, calendar1), (1, calendar2) и т.д.
             short_id = str(idx)
-            context.user_data['calendar_map'][short_id] = cal['id']
+            context.user_data['calendar_map'][short_id] = {
+                'id': cal['id'],
+                'summary': cal['summary']
+            }
             buttons.append([InlineKeyboardButton(cal['summary'], callback_data=f"calendar_{short_id}")]) # опиание выбранного календаря и сам календарь
 
-        await update.message.reply_text(
-            "В какой календарь добавить задачу?",
-            reply_markup=InlineKeyboardMarkup(buttons)
-        )
+        if update.callback_query.message:
+            await update.callback_query.message.reply_text(
+                "В какой календарь добавить задачу?",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="В какой календарь добавить задачу?",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
 
     async def handle_calendar_selection(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
@@ -42,15 +54,25 @@ class EventCreationFlow:
 
         short_id = query.data[len('calendar_'):]
         calendar_map = context.user_data.get('calendar_map', {})
-        calendar_id = calendar_map.get(short_id)
 
-        if not calendar_id:
+        calendar_info = calendar_map.get(short_id)
+        if not calendar_info:
             await query.edit_message_text('Не удалось найти календарь')
             return
+        calendar_id = calendar_info['id']
+        calendar_name = calendar_info['summary']
 
         event = context.user_data.get('event')
         if not event:
-            await query.edit_message_text('Событие не найдено')
+            from services.user_storage import UserStorage
+            storage = UserStorage()
+            storage.set_calendar(update.effective_user.id, calendar_id)
+            await query.edit_message_text(
+                f"✅ Основной календарь выбран: <b>{calendar_name}</b>\nТеперь вы можете отправлять задачи!",
+                parse_mode="HTML"
+            )
+            await send_main_menu(update, context)
+
             return
 
         try:
