@@ -1,5 +1,8 @@
+import os
+
+import uvicorn
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
-from whisper import transcribe
+from server import app as fastapi_app  # FastAPI-приложение
 
 from config import BOT_TOKEN, GOOGLE_CREDS_PATH, GOOGLE_TOKEN_PATH, TIMEZONE
 
@@ -51,16 +54,22 @@ def build_bot():
 
     return app
 
+
 async def main():
-    app = build_bot()  # build_bot синхронный
+    bot_app = build_bot()
     print("🚀 Бот запущен...")
-    await app.initialize()
-    await app.start()
-    await app.run_polling()
+
+    port = int(os.getenv("PORT", 8000))
+    config = uvicorn.Config(fastapi_app, host="0.0.0.0", port=port, log_level="info")
+    server = uvicorn.Server(config)
+
+    await asyncio.gather(
+        bot_app.initialize(),
+        bot_app.run_polling(),
+        server.serve()
+    )
 
 
 if __name__ == "__main__":
-    app = build_bot()
-    print("🚀 Бот запущен...")
-    app.run_polling()
+    asyncio.run(main())
 
