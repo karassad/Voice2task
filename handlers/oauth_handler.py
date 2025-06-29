@@ -20,6 +20,7 @@ class OAuthManager:
             redirect_uri=REDIRECT_URI
         )
 
+
     '''
     формирование ссылки для авторизации
     '''
