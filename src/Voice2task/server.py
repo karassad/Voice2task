@@ -66,13 +66,26 @@ async def oauth_callback(request: Request):
     user_storage = UserStorage()
 
     try:
-        state = int(request.query_params.get('state'))
+        state_from_request = request.query_params.get('state')
+
+        #проверка state
+        user_id = await oauth_handler.verify_state_and_get_user_id(str(state_from_request))
+        if not user_id:
+            logger.info(f"State verification failed for token: {state_from_request}")
+            raise ValueError("State verification failed.")
+
+        #получение учетных данных пользователя
         credentials = await oauth_handler.get_user_credentials(request)
-        logger.info(f"OAuth callback received for state: {state}. credentials: {credentials}")
+        state = state_from_request
+        if credentials is None:
+            logger.error(f"Failed to verify credentials for state: {state}.")
+            raise ValueError("Failed to retrieve credentials.")
+
+        logger.info(f"OAuth callback received for state: {user_id}. credentials: {credentials}")
 
         try:
-            if credentials and state:
-                old_credentials_json = await user_storage.get_user_token(state)
+            if credentials and user_id:
+                old_credentials_json = await user_storage.get_user_token(user_id)
                 old_refresh_token = None
 
                 if old_credentials_json:
@@ -91,17 +104,17 @@ async def oauth_callback(request: Request):
                     'scopes': credentials.scopes
                 }
 
-                logger.info(f"Saving credentials for user {state}: {credentials_dict} in callback_oauth")
+                logger.info(f"Saving credentials for user {user_id}: {credentials_dict} in callback_oauth")
 
-                await user_storage.set_user_data(state, credentials_dict)
-                logger.info(f"Credentials saved successfully for user {state}.")
+                await user_storage.set_user_data(user_id, credentials_dict)
+                logger.info(f"Credentials saved successfully for user {user_id}.")
 
                 return templates.TemplateResponse('auth_success.html', {"request": request})
             else:
-                logger.error(f"Invalid credentials or state for user {state}.")
+                logger.error(f"Invalid credentials or state for user {user_id}.")
 
         except Exception as e:
-            logger.error(f"Error saving credentials for user {state}: {e}", exc_info=True)
+            logger.error(f"Error saving credentials for user {user_id}: {e}", exc_info=True)
 
     except Exception as e:
         logger.error(f"Error in OAuth callback: {e}", exc_info=True)

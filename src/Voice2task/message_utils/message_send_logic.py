@@ -59,7 +59,7 @@ async def send_smart_message(update: Update, context: ContextTypes.DEFAULT_TYPE,
     Сохраняет message_id последнего сообщения бота в user_data.
     """
     # last_message = context.user_data.get('last_message', True)
-    if last_message:
+    if not last_message:
         await send_new_message(update, context, text, reply_markup)
     else:
         await edit_message(update, context, text, last_message)

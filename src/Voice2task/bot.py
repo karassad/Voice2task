@@ -47,21 +47,21 @@ class Bot:
             await send_new_message(update, context, f'Привет, {user_name}!')
             logger.info(f"User {user_id} started the bot.")
             oauthHandler = OauthHandler()
-            await oauthHandler.user_auth_process(str(user_id), update)
+            await oauthHandler.user_auth_process(user_id, update, context)
 
             #выбор календаря
             #если календарь выбран, отправляем главное меню
-            if await self.main_calendar_setup.check_is_main_calendar_set(user_id=str(user_id)):
-                await send_main_menu(context.bot, update.effective_chat.id, update)
-
-            #если календарь не установлен, запускаем процесс выбора календаря
-            else:
-                try:
-                    await self.main_calendar_setup.start_calendar_selection_flow(update, context)
-                    logger.info(f"Started calendar selection flow for user {user_id}.")
-
-                except Exception as e:
-                    logger.error(f"Error starting calendar selection flow for user {user_id}: {e}", exc_info=True)
+            # if await self.main_calendar_setup.check_is_main_calendar_set(user_id=str(user_id)):
+            #     await send_main_menu(context.bot, update.effective_chat.id, update)
+            #
+            # #если календарь не установлен, запускаем процесс выбора календаря
+            # else:
+            #     try:
+            #         await self.main_calendar_setup.start_calendar_selection_flow(update, context)
+            #         logger.info(f"Started calendar selection flow for user {user_id}.")
+            #
+            #     except Exception as e:
+            #         logger.error(f"Error starting calendar selection flow for user {user_id}: {e}", exc_info=True)
 
         except Exception as e:
             logger.error(f"Error sending start message to user {user_id}: {e}", exc_info=True)

@@ -76,14 +76,22 @@ class UserStorage:
         """Шифрует только значения словаря."""
         encrypted_data = {}
         for key, value in data.items():
-            encrypted_data[key] = self._encrypt_value(value)
+            if isinstance(value, list):
+                # Если значение - это список, шифруем каждый элемент списка
+                encrypted_data[key] = [self._encrypt_value(item) for item in value]
+            else:
+                encrypted_data[key] = self._encrypt_value(value)
         return encrypted_data
 
     def _decrypt_dict_values(self, data: dict):
         """Расшифровывает только значения словаря."""
         decrypted_data = {}
         for key, value in data.items():
-            decrypted_data[key] = self._decrypt_value(value)
+            if isinstance(value, list):
+                # Если значение - это список, расшифровываем каждый элемент списка
+                decrypted_data[key] = [self._decrypt_value(item) for item in value]
+            else:
+                decrypted_data[key] = self._decrypt_value(value)
         return decrypted_data
 
     async def set_user_data(self, user_id: int, data: dict):
@@ -110,7 +118,7 @@ class UserStorage:
         try:
             encrypted_data = self._encrypt_dict_values(data)
             doc_ref = self.db.collection('users_dev').document(str(user_id))
-            await asyncio.to_thread(doc_ref.update, encrypted_data)
+            await asyncio.to_thread(doc_ref.set, encrypted_data, merge=True)
             logger.info(f"User data for {user_id} saved successfully.")
         except Exception as e:
             logger.error(f"Error saving user data for {user_id}: {e}", exc_info=True)

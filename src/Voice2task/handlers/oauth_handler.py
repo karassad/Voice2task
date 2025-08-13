@@ -1,5 +1,7 @@
 import logging
-
+import secrets
+from telegram.ext import Application, ContextTypes
+from ..message_utils.message_send_logic import send_smart_message
 from google_auth_oauthlib.flow import Flow
 from telegram import Update
 from fastapi import Request
@@ -15,14 +17,18 @@ class OauthHandler:
         self.client_secret = GOOGLE_CLIENT_SECRET
         self.scopes = SCOPES
         self.redirect_uri = REDIRECT_URI
+        self.user_storage = UserStorage()
 
-    async def create_auth_url(self, state: str, update: Update):
+    async def create_auth_url(self, user_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
         Создает URL для авторизации пользователя в Google OAuth 2.0.
-        :param state:
+        :param user_id
         :param update:
         :return: authorization URL
         """
+        state = secrets.token_urlsafe(32) #state для защиты от CSRF атак, уникальный для каждого запроса
+        await self.user_storage.update_user_data(user_id, {'state': state})
+
         flow = Flow.from_client_secrets_file(
             client_secrets_file=self.client_secret,
             scopes=self.scopes,
@@ -33,13 +39,13 @@ class OauthHandler:
             prompt='consent',
             access_type='offline', #режим оффлайн для получения refresh токена
             include_granted_scopes='true', #список разрешений
-            state=state, #user_id
+            state=state
         )
 
         oauth_sessions[state] = flow
         logger.info(f"Saved OAuth flow for state: {state}")
 
-        await update.message.reply_text('Пожалуйста, перейдите по следующей ссылке для авторизации: ' + auth_url)
+        await send_smart_message(update=update, context=context, text='Пожалуйста, перейдите по следующей ссылке для авторизации: ' + auth_url, last_message=False, reply_markup=None)
 
     async def get_user_credentials(self, request: Request):
         '''
@@ -66,7 +72,7 @@ class OauthHandler:
             logger.error(f"Error fetching token for state {state}: {e}", exc_info=True)
             return None
 
-    async def user_auth_process(self, state: str, update: Update):
+    async def user_auth_process(self, user_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
         Обрабатывает процесс авторизации пользователя.
         :param state: user_id
@@ -74,15 +80,34 @@ class OauthHandler:
         """
         us = UserStorage()
         try:
-            if await us.get_user_token(int(state)) != False:
-                logger.info(f"User {state} is already authorized.")
+            if await us.get_user_token(int(user_id)) != False:
+                logger.info(f"User {user_id} is already authorized.")
                 #логика запуска флоу
             else:
-                logger.info(f"User {state} is not authorized. Creating auth URL.")
-                await self.create_auth_url(state, update)
+                logger.info(f"User {user_id} is not authorized. Creating auth URL.")
+                await self.create_auth_url(int(user_id), update, context)
 
         except Exception as e:
-            logger.error(f"Error during user authorization process for user {state}: {e}", exc_info=True)
+            logger.error(f"Error during user authorization process for user {user_id}: {e}", exc_info=True)
+
+    async def verify_state_and_get_user_id(self, state: str):
+        """
+        Проверяет, соответствует ли полученный state сохраненному,
+        и возвращает user_id.
+        """
+        docs = self.user_storage.db.collection('users_dev').stream()
+        for doc in docs:
+            data = doc.to_dict()
+            try:
+                decrypted_state = self.user_storage._decrypt_value(data.get('state'))
+                if decrypted_state == state:
+                    await self.user_storage.update_user_data(int(doc.id), {'state': None})
+                    return int(doc.id)
+
+            except Exception as e:
+                logger.error(f"Error verify state for user {doc.id}: {e}", exc_info=True)
+        return None
+
 
 
 
