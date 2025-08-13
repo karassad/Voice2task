@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from starlette.templating import Jinja2Templates
@@ -9,7 +10,8 @@ from .db_services.user_storage import UserStorage
 from .handlers.oauth_handler import OauthHandler
 
 
-templates = Jinja2Templates(directory='templates')
+templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
+templates = Jinja2Templates(directory=templates_dir)
 
 
 bot_app: Application | None = None

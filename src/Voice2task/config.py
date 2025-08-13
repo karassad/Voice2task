@@ -17,3 +17,5 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.events',
 
 FIREBASE_SERVICE_ACCOUNT_KEY_PATH = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH")
 FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID")
+
+FERNET_KEY = os.getenv('FERNET_KEY')
