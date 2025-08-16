@@ -12,7 +12,7 @@ from google.auth.transport.requests import Request
 from telegram.ext import ContextTypes
 
 from ..db_services.user_storage import UserStorage
-from ..message_utils.message_send_logic import edit_message
+from ..message_utils.message_send_logic import edit_message, send_new_message
 from ..server import bot_app
 
 
@@ -114,14 +114,19 @@ class CalendarService:
                 calendar_id = calendar.get('id')
                 hashed_cal_id = hashlib.sha256(calendar_id.encode('utf-8')).hexdigest()[:16] #хэшированный ID календаря
 
-                context.user_data[f'calendar_hash_{hashed_cal_id}'] = calendar_id
+                context.user_data[f'calendar_hash_{hashed_cal_id}'] = {
+                    'id': calendar_id,
+                    'summary': calendar.get('summary')
+                }
                 buttons.append([InlineKeyboardButton(calendar['summary'], callback_data=f'calendar_{hashed_cal_id}')])
                 logger.info(f"Добавлена кнопка для календаря: {calendar['summary']} (ID: {calendar_id}), хэш: {hashed_cal_id}")
             keyboard = InlineKeyboardMarkup(buttons)
-            # await context.bot.send_message(chat_id=user_id,
-            #                          text="Выберите календарь:",
-            #                             reply_markup=keyboard)
-            await edit_message(update, context, text="Выберите календарь:",
+
+            if update.callback_query:
+                await edit_message(update, context, text="Выберите календарь:",
+                                   reply_markup=keyboard)
+            else:
+                 await send_new_message(update, context, text="Выберите календарь:",
                                         reply_markup=keyboard)
 
 

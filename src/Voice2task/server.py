@@ -4,10 +4,13 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from starlette.templating import Jinja2Templates
-from telegram import Update
-from telegram.ext import Application
+from telegram.ext import Application, ContextTypes
 from .db_services.user_storage import UserStorage
+
 from .handlers.oauth_handler import OauthHandler
+from telegram import Update
+from fastapi import Request
+
 
 
 templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -108,6 +111,42 @@ async def oauth_callback(request: Request):
 
                 await user_storage.set_user_data(user_id, credentials_dict)
                 logger.info(f"Credentials saved successfully for user {user_id}.")
+
+                # #создаем фиктивный запрос от пользователя после первой, чтобы запусить логику выбора календаря и меню
+                #
+                # user_data = await bot_app.bot.get_chat(user_id)
+                #
+                # # Создаем JSON-структуру, имитирующую обновление от Telegram
+                # update_data = {
+                #     'update_id': 0,  # Фиктивный ID
+                #     'message': {
+                #         'message_id': 0,  # Фиктивный ID
+                #         'from': {
+                #             'id': user_data.id,
+                #             'is_bot': False,  # Явно указываем, что это не бот
+                #             'first_name': user_data.first_name,
+                #             'username': user_data.username,
+                #             'language_code': 'ru'  # или другой, если нужно
+                #         },
+                #         'chat': user_data.to_dict(),  # Chat-объект может быть использован напрямую
+                #         'date': 0,  # Фиктивная дата
+                #         'text': '/calendar_update',
+                #         'entities': [{'offset': 0, 'length': len('/calendar_update'), 'type': 'bot_command'}]
+                #     }
+                # }
+                #
+                # # Создаем реальный объект Update из нашей JSON-структуры
+                # dummy_update = Update.de_json(update_data, bot_app.bot)
+                # await bot_app.update_queue.put(dummy_update)
+                # logger.info(f"Dummy update with /calendar_update command queued for user {user_id}")
+                #
+                # # from .google_calendar_services.main_calendar_setup import MainCalendarSetup
+                # # from .tg_bot_markups.main_menu import send_main_menu
+                # # main_calendar_setup = MainCalendarSetup()
+                # #
+                # # await main_calendar_setup.start_calendar_selection_flow(dummy_update, dummy_context)
+                # #
+                # # await send_main_menu(dummy_context.bot, dummy_update.effective_chat.id, dummy_update)
 
                 return templates.TemplateResponse('auth_success.html', {"request": request})
             else:

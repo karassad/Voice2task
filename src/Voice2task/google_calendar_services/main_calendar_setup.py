@@ -41,12 +41,17 @@ class MainCalendarSetup:
         """
         try:
             calendar_status = await self.user_storage.get_main_calendar(int(user_id))
+
             logger.info(f"Проверка основного календаря для пользователя {user_id}: {calendar_status}")
+
             if not calendar_status:
-                #логика выбора календаря
-                return None
+                logger.info(f"Основной календарь не установлен для пользователя {user_id}.")
+                return False
+
             else:
+                logger.info(f"Основной календарь установлен для пользователя {user_id}.")
                 return True
+
         except Exception as e:
             logger.error(f"Ошибка при проверке основного календаря: {e}", exc_info=True)
             return False
@@ -62,28 +67,34 @@ class MainCalendarSetup:
             await query.answer()
 
             callback_data = query.data
+
+            if callback_data == 'calendar_update':
+                logger.info(f"User {user_id} requested to update calendars.")
+                # Вызываем метод для старта потока выбора календаря.
+                await self.start_calendar_selection_flow(update, context)
+                return
+
             if not callback_data.startswith('calendar_'):
                 # Это не наш callback, выходим
                 return
             logger.info(f"Пользователь {user_id} выбрал календарь: {callback_data}")
 
             try:
+                #извлекаем из контекста выбранный календарь
                 hashed_cal_id = callback_data.replace('calendar_', '')
-                orig_cal_id = context.user_data.get(f'calendar_hash_{hashed_cal_id}')
+                calendar_info = context.user_data.get(f'calendar_hash_{hashed_cal_id}')
 
-                if not orig_cal_id:
-                    logger.error(f"Не найден оригинальный ID календаря для хеша {hashed_cal_id} у пользователя {user_id}.")
-                    return
+                await self.user_storage.update_user_data(user_id, {
+                    'main_calendar_id': calendar_info['id'],
+                    'main_calendar_name': calendar_info['summary']
+                })
 
-                await self.user_storage.update_user_data(user_id, {'calendar': orig_cal_id})
-                # await context.bot.send_message(
-                #     chat_id=user_id,
-                #     text=f"Выбран календарь: {orig_cal_id}. Теперь вы можете создавать события в этом календаре."
-                # )
-                await edit_message(update, context, text=f"Выбран календарь: {orig_cal_id}. Теперь вы можете создавать события в этом календаре.")
-                del context.user_data[f'calendar_hash_{hashed_cal_id}']
+                logger.info(f"Пользователь {user_id} установил в бд: {calendar_info['summary']} ({calendar_info['id']})")
 
                 await send_main_menu(context.bot, update.effective_chat.id, update)
+
+                del context.user_data[f'calendar_hash_{hashed_cal_id}']
+
 
             except Exception as e:
                 logger.error(f"Ошибка при обработке выбора календаря: {e}", exc_info=True)

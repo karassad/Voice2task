@@ -5,7 +5,8 @@ from .bot import Bot
 from .server import fastapi_app
 from .config import WEBHOOK_URL
 from .google_calendar_services.main_calendar_setup import MainCalendarSetup
-
+from .main_commands.start_handler import start_command
+from .main_commands.change_calendar_handler import calendar_update_command
 
 def main():
     """
@@ -21,7 +22,8 @@ def main():
 
     main_calendar_setup = MainCalendarSetup()
 
-    bot_app.add_handler(CommandHandler("start", bot_instance.start_command))
+    bot_app.add_handler(CommandHandler("start", start_command))
+    bot_app.add_handler(CommandHandler("calendar_update", calendar_update_command))
     bot_app.add_handler(
         CallbackQueryHandler(
             main_calendar_setup.handle_main_calendar_selection,

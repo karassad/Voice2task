@@ -1,12 +1,15 @@
 import logging
 import secrets
 from telegram.ext import Application, ContextTypes
+
+
 from ..message_utils.message_send_logic import send_smart_message
 from google_auth_oauthlib.flow import Flow
 from telegram import Update
 from fastapi import Request
 from ..db_services.user_storage import UserStorage
 from ..config import GOOGLE_CLIENT_SECRET, SCOPES, REDIRECT_URI
+from ..tg_bot_markups.main_menu import send_main_menu
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,10 +82,13 @@ class OauthHandler:
         :param update: Update object
         """
         us = UserStorage()
+        from ..google_calendar_services.main_calendar_setup import MainCalendarSetup
         try:
             if await us.get_user_token(int(user_id)) != False:
-                logger.info(f"User {user_id} is already authorized.")
-                #логика запуска флоу
+                # Пользователь уже авторизован
+                logger.info(f"User {user_id} is already authorized ")
+                # await send_main_menu(context.bot, update.effective_chat.id, update)
+
             else:
                 logger.info(f"User {user_id} is not authorized. Creating auth URL.")
                 await self.create_auth_url(int(user_id), update, context)

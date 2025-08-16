@@ -46,6 +46,7 @@ class UserStorage:
             logger.error(f"Ошибка при инициализации Firestore: {e}", exc_info=True)
             raise
 
+
     def _encrypt_value(self, value: str):
         """
         Шифрует значение с помощью Fernet.
@@ -58,6 +59,7 @@ class UserStorage:
                 return encrypted_value.decode('utf-8') #закодированная строка
             except Exception as e:
                 logger.error(f"Error encrypting value: {e}", exc_info=True)
+
 
     def _decrypt_value(self, value: str):
         """
@@ -126,7 +128,7 @@ class UserStorage:
 
     async def get_main_calendar(self, user_id: int):
         """
-        Получает основной календарь пользователя из Firestore.
+        Получает основной календарь пользователя из Firestore. Возвращает словарь с ID и именем календаря,
         :param user_id: ID пользователя Telegram.
         """
         try:
@@ -135,9 +137,12 @@ class UserStorage:
             if fields.exists:
                 data = fields.to_dict()
                 decrypted_data = self._decrypt_dict_values(data)
-                if 'calendar' in data:
+                if 'main_calendar_id' in decrypted_data:
                     logger.info(f"Main calendar for {user_id} retrieved successfully.")
-                    return decrypted_data['calendar']
+                    return {
+                        'id': decrypted_data.get('main_calendar_id'),
+                        'name': decrypted_data.get('main_calendar_name')
+                    }
                 else:
                     return False
             logger.info(f"Main calendar for {user_id} retrieved successfully.")
