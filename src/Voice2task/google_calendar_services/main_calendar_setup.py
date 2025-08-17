@@ -22,12 +22,12 @@ class MainCalendarSetup:
         self.user_storage = UserStorage()
         self.calendar_service = CalendarService()
 
-    async def start_calendar_selection_flow(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def start_calendar_selection_flow(self, user_id: int, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
             Запускает процесс выбора основного календаря. (запускает make_list_calendar_buttons из CalendarService)
             Получает список календарей и отправляет пользователю кнопки.
         """
-        user_id = update.effective_user.id
+        # user_id = update.effective_user.id
         try:
             logger.info(f"Запуск процесса выбора основного календаря для пользователя {user_id}.")
             await self.calendar_service.make_list_calendar_buttons(str(user_id), update, context)

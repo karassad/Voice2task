@@ -2,7 +2,6 @@ import logging
 import secrets
 from telegram.ext import Application, ContextTypes
 
-
 from ..message_utils.message_send_logic import send_smart_message
 from google_auth_oauthlib.flow import Flow
 from telegram import Update
@@ -30,7 +29,9 @@ class OauthHandler:
         :return: authorization URL
         """
         state = secrets.token_urlsafe(32) #state для защиты от CSRF атак, уникальный для каждого запроса
-        await self.user_storage.update_user_data(user_id, {'state': state})
+        await self.user_storage.update_user_data(user_id, {
+            'state': state})
+
 
         flow = Flow.from_client_secrets_file(
             client_secrets_file=self.client_secret,
@@ -81,17 +82,11 @@ class OauthHandler:
         :param state: user_id
         :param update: Update object
         """
-        us = UserStorage()
-        from ..google_calendar_services.main_calendar_setup import MainCalendarSetup
+        # us = UserStorage()
+        # from ..google_calendar_services.main_calendar_setup import MainCalendarSetup
         try:
-            if await us.get_user_token(int(user_id)) != False:
-                # Пользователь уже авторизован
-                logger.info(f"User {user_id} is already authorized ")
-                # await send_main_menu(context.bot, update.effective_chat.id, update)
-
-            else:
-                logger.info(f"User {user_id} is not authorized. Creating auth URL.")
-                await self.create_auth_url(int(user_id), update, context)
+            logger.info(f"User {user_id} is not authorized. Creating auth URL.")
+            await self.create_auth_url(int(user_id), update, context)
 
         except Exception as e:
             logger.error(f"Error during user authorization process for user {user_id}: {e}", exc_info=True)
@@ -114,6 +109,19 @@ class OauthHandler:
                 logger.error(f"Error verify state for user {doc.id}: {e}", exc_info=True)
         return None
 
+    # async def oauth_success(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #     """
+    #         Вызывается после успешного завершения авторизации.
+    #         Запускает процесс выбора основного календаря.
+    #     """
+    #     user_id = update.effective_user.id
+    #     logger.info(f"OAuth success for user {user_id}. Starting main calendar setup.")
+    #     main_calendar_setup = MainCalendarSetup()
+    #     try:
+    #         await main_calendar_setup.start_calendar_selection_flow(update, context)
+    #     except Exception as e:
+    #         logger.error(f"Error starting main calendar setup for user {user_id}: {e}", exc_info=True)
+    #
 
 
 

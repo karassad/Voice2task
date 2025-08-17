@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from operator import truediv
 
 from cryptography.fernet import Fernet
 from google.oauth2 import service_account
@@ -191,6 +192,20 @@ class UserStorage:
         except Exception as e:
             logger.error(f"Error getting user data for {user_id}: {e}", exc_info=True)
             raise
+
+    async def delete_all_user_data(self, user_id: int):
+        """
+        Удаляет все данные пользователя из Firestore.
+        :param user_id: ID пользователя Telegram.
+        """
+        try:
+            doc_ref = self.db.collection('users_dev').document(str(user_id))
+            await asyncio.to_thread(doc_ref.delete)
+            logger.info(f"All data for user {user_id} deleted successfully.")
+        except Exception as e:
+            logger.error(f"Error deleting user data for {user_id}: {e}", exc_info=True)
+            raise
+
 
 
 # us = UserStorage()

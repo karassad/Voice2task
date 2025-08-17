@@ -2,13 +2,15 @@ import json
 import logging
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime
+
 from fastapi import FastAPI, Request
 from starlette.templating import Jinja2Templates
-from telegram.ext import Application, ContextTypes
+from telegram.ext import Application, ContextTypes, CallbackContext
 from .db_services.user_storage import UserStorage
 
 from .handlers.oauth_handler import OauthHandler
-from telegram import Update
+from telegram import Update, Message, Chat, User
 from fastapi import Request
 
 
@@ -104,53 +106,56 @@ async def oauth_callback(request: Request):
                     'token_uri': credentials.token_uri,
                     'client_id': credentials.client_id,
                     'client_secret': credentials.client_secret,
-                    'scopes': credentials.scopes
+                    'scopes': credentials.scopes,
+                    'chat_id': user_id
                 }
 
                 logger.info(f"Saving credentials for user {user_id}: {credentials_dict} in callback_oauth")
 
-                await user_storage.set_user_data(user_id, credentials_dict)
+                await user_storage.update_user_data(user_id, credentials_dict)
                 logger.info(f"Credentials saved successfully for user {user_id}.")
 
-                # #создаем фиктивный запрос от пользователя после первой, чтобы запусить логику выбора календаря и меню
-                #
-                # user_data = await bot_app.bot.get_chat(user_id)
-                #
-                # # Создаем JSON-структуру, имитирующую обновление от Telegram
-                # update_data = {
-                #     'update_id': 0,  # Фиктивный ID
-                #     'message': {
-                #         'message_id': 0,  # Фиктивный ID
-                #         'from': {
-                #             'id': user_data.id,
-                #             'is_bot': False,  # Явно указываем, что это не бот
-                #             'first_name': user_data.first_name,
-                #             'username': user_data.username,
-                #             'language_code': 'ru'  # или другой, если нужно
-                #         },
-                #         'chat': user_data.to_dict(),  # Chat-объект может быть использован напрямую
-                #         'date': 0,  # Фиктивная дата
-                #         'text': '/calendar_update',
-                #         'entities': [{'offset': 0, 'length': len('/calendar_update'), 'type': 'bot_command'}]
-                #     }
-                # }
-                #
-                # # Создаем реальный объект Update из нашей JSON-структуры
-                # dummy_update = Update.de_json(update_data, bot_app.bot)
-                # await bot_app.update_queue.put(dummy_update)
-                # logger.info(f"Dummy update with /calendar_update command queued for user {user_id}")
-                #
-                # # from .google_calendar_services.main_calendar_setup import MainCalendarSetup
-                # # from .tg_bot_markups.main_menu import send_main_menu
-                # # main_calendar_setup = MainCalendarSetup()
-                # #
-                # # await main_calendar_setup.start_calendar_selection_flow(dummy_update, dummy_context)
-                # #
-                # # await send_main_menu(dummy_context.bot, dummy_update.effective_chat.id, dummy_update)
+                bot_app = request.app.telegram_app_instance
 
-                return templates.TemplateResponse('auth_success.html', {"request": request})
-            else:
-                logger.error(f"Invalid credentials or state for user {user_id}.")
+                user_data = await user_storage.get_user_data(user_id)
+                if not user_data:
+                    logger.error(f"User data for {user_id} not found after auth.")
+                    return templates.TemplateResponse('auth_failed.html', {"request": request})
+
+                # Создаем dummy Message, чтобы Update мог корректно инициализировать effective_user/chat
+                dummy_message = Message(
+                    message_id=1,
+                    date=datetime.now(),
+                    chat=Chat(id=user_id, type="private"),
+                    from_user=User(id=user_id, first_name="OAuthUser", is_bot=False),
+                    text="/oauth_callback_internal"
+                )
+                # Привязываем bot к dummy_message
+                dummy_message._bot = bot_app.bot
+
+                mock_context = ContextTypes.DEFAULT_TYPE(
+                    application=bot_app,
+                    user_id=user_id,
+                    chat_id=user_id
+                )
+
+                # Инициализируем mock_update перед использованием
+                mock_update = Update(
+                    update_id=0,
+                    message=dummy_message
+                )
+
+                from .google_calendar_services.main_calendar_setup import MainCalendarSetup
+                main_calendar_setup = MainCalendarSetup()
+
+                try:
+                    # await main_calendar_setup.start_calendar_selection_flow(dummy_update, CallbackContext.from_update(dummy_update, application=bot_app))
+                    await main_calendar_setup.start_calendar_selection_flow(user_id, mock_update, mock_context)
+
+                except Exception as e:
+                    logger.error(f"Error starting main calendar setup for user {user_id}: {e}", exc_info=True)
+
+            return templates.TemplateResponse('auth_success.html', {"request": request})
 
         except Exception as e:
             logger.error(f"Error saving credentials for user {user_id}: {e}", exc_info=True)

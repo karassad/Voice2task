@@ -114,6 +114,9 @@ class CalendarService:
                 calendar_id = calendar.get('id')
                 hashed_cal_id = hashlib.sha256(calendar_id.encode('utf-8')).hexdigest()[:16] #хэшированный ID календаря
 
+                if context.user_data is None:
+                    context.user_data = {}
+
                 context.user_data[f'calendar_hash_{hashed_cal_id}'] = {
                     'id': calendar_id,
                     'summary': calendar.get('summary')

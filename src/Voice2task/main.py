@@ -7,6 +7,7 @@ from .config import WEBHOOK_URL
 from .google_calendar_services.main_calendar_setup import MainCalendarSetup
 from .main_commands.start_handler import start_command
 from .main_commands.change_calendar_handler import calendar_update_command
+from .main_commands.restart_handler import restart_command
 
 def main():
     """
@@ -24,6 +25,15 @@ def main():
 
     bot_app.add_handler(CommandHandler("start", start_command))
     bot_app.add_handler(CommandHandler("calendar_update", calendar_update_command))
+    bot_app.add_handler(CommandHandler('restart', restart_command))
+
+    bot_app.add_handler(
+        CallbackQueryHandler(
+            restart_command,
+            pattern=r'^restart$'
+        )
+    )
+
     bot_app.add_handler(
         CallbackQueryHandler(
             main_calendar_setup.handle_main_calendar_selection,
