@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 from google.oauth2 import service_account
 from rsa.cli import encrypt
 
-from ..config import FIREBASE_SERVICE_ACCOUNT_KEY_PATH, FERNET_KEY
+from src.Voice2task.config import FIREBASE_SERVICE_ACCOUNT_KEY_PATH, FERNET_KEY
 import firebase_admin
 from firebase_admin import firestore
 

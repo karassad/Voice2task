@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot, Update
-from ..db_services.user_storage import UserStorage
+from src.Voice2task.db_services.user_storage import UserStorage
 import logging
 
 
@@ -15,7 +15,7 @@ async def send_main_menu(bot: Bot, chat_id: int, update: Update):
     logger.info(f"Основной календарь для пользователя {update.effective_user.id}: {calendar_name}")
 
     buttons = [
-        [InlineKeyboardButton("📝 Создать задачу", callback_data="create_task")],
+        [InlineKeyboardButton("📝 Создать задачу", callback_data="create_event")],
         [InlineKeyboardButton("📞 Создать созвон (Google Meet)", callback_data="create_meet")],
         [InlineKeyboardButton("📅 Сменить календарь", callback_data="calendar_update")],
         [InlineKeyboardButton("🔄 Рестарт бота (повторная авторизация)", callback_data="restart")],

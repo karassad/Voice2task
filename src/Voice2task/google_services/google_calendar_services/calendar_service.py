@@ -6,15 +6,13 @@ from googleapiclient.discovery import build
 from google.auth.aio.credentials import Credentials
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
-from ..config import SCOPES
+from src.Voice2task.config import SCOPES
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from telegram.ext import ContextTypes
 
-from ..db_services.user_storage import UserStorage
-from ..message_utils.message_send_logic import edit_message, send_new_message
-from ..server import bot_app
-
+from src.Voice2task.db_services.user_storage import UserStorage
+from src.Voice2task.tg_services.message_utils.message_send_logic import edit_message, send_new_message
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

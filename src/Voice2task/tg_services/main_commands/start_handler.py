@@ -1,11 +1,10 @@
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..message_utils.message_send_logic import send_new_message
-from ..handlers.oauth_handler import OauthHandler
-from ..google_calendar_services.main_calendar_setup import MainCalendarSetup
-from ..tg_bot_markups.main_menu import send_main_menu
-from ..db_services.user_storage import UserStorage
+from src.Voice2task.tg_services.message_utils.message_send_logic import send_new_message
+from src.Voice2task.google_services.auth_services.oauth_handler import OauthHandler
+from src.Voice2task.tg_services.tg_bot_markups.main_menu import send_main_menu
+from src.Voice2task.db_services.user_storage import UserStorage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -2,7 +2,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 from ..main_commands.start_handler import start_command
-from ..db_services.user_storage import UserStorage
+from src.Voice2task.db_services.user_storage import UserStorage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

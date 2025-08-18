@@ -1,14 +1,13 @@
 import logging
 import secrets
-from telegram.ext import Application, ContextTypes
+from telegram.ext import ContextTypes
 
-from ..message_utils.message_send_logic import send_smart_message
+from src.Voice2task.tg_services.message_utils.message_send_logic import send_smart_message
 from google_auth_oauthlib.flow import Flow
 from telegram import Update
 from fastapi import Request
-from ..db_services.user_storage import UserStorage
-from ..config import GOOGLE_CLIENT_SECRET, SCOPES, REDIRECT_URI
-from ..tg_bot_markups.main_menu import send_main_menu
+from src.Voice2task.db_services.user_storage import UserStorage
+from src.Voice2task.config import GOOGLE_CLIENT_SECRET, SCOPES, REDIRECT_URI
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

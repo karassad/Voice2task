@@ -1,7 +1,7 @@
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..google_calendar_services.main_calendar_setup import MainCalendarSetup
+from src.Voice2task.google_services.google_calendar_services.main_calendar_setup import MainCalendarSetup
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

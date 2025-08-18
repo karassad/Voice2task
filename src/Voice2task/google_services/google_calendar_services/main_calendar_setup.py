@@ -1,14 +1,12 @@
 import logging
-from calendar import calendar
 
 from telegram import Update
 
-from ..db_services.user_storage import UserStorage
+from ...db_services.user_storage import UserStorage
 from ..google_calendar_services.calendar_service import CalendarService
 from telegram.ext import ContextTypes
 
-from ..message_utils.message_send_logic import edit_message
-from ..tg_bot_markups.main_menu import send_main_menu
+from ...tg_services.tg_bot_markups.main_menu import send_main_menu
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -71,7 +69,7 @@ class MainCalendarSetup:
             if callback_data == 'calendar_update':
                 logger.info(f"User {user_id} requested to update calendars.")
                 # Вызываем метод для старта потока выбора календаря.
-                await self.start_calendar_selection_flow(update, context)
+                await self.start_calendar_selection_flow(user_id, update, context)
                 return
 
             if not callback_data.startswith('calendar_'):

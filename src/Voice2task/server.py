@@ -4,12 +4,12 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from starlette.templating import Jinja2Templates
-from telegram.ext import Application, ContextTypes, CallbackContext
-from .db_services.user_storage import UserStorage
+from telegram.ext import Application, ContextTypes
+from src.Voice2task.db_services.user_storage import UserStorage
 
-from .handlers.oauth_handler import OauthHandler
+from src.Voice2task.google_services.auth_services.oauth_handler import OauthHandler
 from telegram import Update, Message, Chat, User
 from fastapi import Request
 
@@ -145,7 +145,7 @@ async def oauth_callback(request: Request):
                     message=dummy_message
                 )
 
-                from .google_calendar_services.main_calendar_setup import MainCalendarSetup
+                from src.Voice2task.google_services.google_calendar_services.main_calendar_setup import MainCalendarSetup
                 main_calendar_setup = MainCalendarSetup()
 
                 try:

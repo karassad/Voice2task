@@ -1,8 +1,7 @@
 import logging
-from telegram import Update
 from .config import BOT_TOKEN
 from telegram.ext import Application
-from .google_calendar_services.main_calendar_setup import MainCalendarSetup
+from src.Voice2task.google_services.google_calendar_services.main_calendar_setup import MainCalendarSetup
 
 
 logging.basicConfig(level=logging.INFO)
