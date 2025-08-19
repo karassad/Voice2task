@@ -13,6 +13,7 @@ from src.Voice2task.tg_services.main_commands.start_handler import start_command
 from src.Voice2task.tg_services.main_commands.change_calendar_handler import calendar_update_command
 from src.Voice2task.tg_services.main_commands.restart_handler import restart_command
 from src.Voice2task.ai_services.gemini_parser import GeminiParser
+from src.Voice2task.tg_services.main_commands.creating_events.create_google_meet_handler import create_google_meet_command
 
 def main():
     """
@@ -40,6 +41,8 @@ def main():
         )
     )
 
+
+
     bot_app.add_handler(
         CallbackQueryHandler(
             main_calendar_setup.handle_main_calendar_selection,
@@ -51,7 +54,9 @@ def main():
         # точка входа в разговор
         entry_points=[
             CommandHandler('create_event', create_event_command),
-            CallbackQueryHandler(create_event_command, pattern='^create_event$')
+            CommandHandler('create_google_meet', create_google_meet_command),
+            CallbackQueryHandler(create_event_command, pattern='^create_event$'),
+            CallbackQueryHandler(create_google_meet_command, pattern='^create_google_meet$')
         ],
         # этапы разговора, каждый со своим списком обработчиков сообщений
         states={

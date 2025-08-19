@@ -16,7 +16,7 @@ async def send_main_menu(bot: Bot, chat_id: int, update: Update):
 
     buttons = [
         [InlineKeyboardButton("📝 Создать задачу", callback_data="create_event")],
-        [InlineKeyboardButton("📞 Создать созвон (Google Meet)", callback_data="create_meet")],
+        [InlineKeyboardButton("📞 Создать созвон (Google Meet)", callback_data="create_google_meet")],
         [InlineKeyboardButton("📅 Сменить календарь", callback_data="calendar_update")],
         [InlineKeyboardButton("🔄 Рестарт бота (повторная авторизация)", callback_data="restart")],
     ]
