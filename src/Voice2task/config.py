@@ -22,3 +22,5 @@ FERNET_KEY = os.getenv('FERNET_KEY')
 
 GEMINI_API_KEY = os.getenv('API_GEMINI_KEY')
 GEMINI_API_URL = os.getenv('API_GEMINI_URL')
+
+VOICE_TRANSCRIBER_PATH = 'src/Voice2task/transcriber_services/vosk-model-small-ru-0.22'

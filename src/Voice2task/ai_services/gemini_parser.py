@@ -19,7 +19,7 @@ class GeminiParser:
         self.gemini_api_key = GEMINI_API_KEY
 
 
-    async def parse_user_request(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def parse_user_request(self, update: Update, context: ContextTypes.DEFAULT_TYPE, text: str):
         """
         Парсит текст с помощью Gemini API.
         :param text: Текст для парсинга.
@@ -27,7 +27,7 @@ class GeminiParser:
         """
         user_id = update.effective_user.id
         user_name = update.effective_user.first_name
-        user_message = update.message.text
+        user_message = text
         logger.info(f"Received task from user {user_id} ({user_name}): '{user_message}'")
 
 
