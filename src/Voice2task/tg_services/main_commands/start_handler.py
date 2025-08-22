@@ -14,6 +14,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Обрабатывает команду /start.
     проверяет, авторизован ли пользователь, и направляет его в соответствующий поток
     """
+    if update.callback_query:
+        await update.callback_query.answer()
+
     user_id = update.effective_user.id
     user_name = update.effective_user.first_name
     logger.info(f"Received /start command from user {user_id} ({user_name})")
@@ -30,7 +33,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"User {user_id} is authorized with token: {token}")
             logger.info(f"User {user_id} is already authorized ")
 
-            await send_main_menu(context.bot, update.effective_chat.id, update)
+            await send_main_menu(update, context, True)
 
         else:
             logger.info(f"User {user_id} is not authorized. Starting OAuth process.")

@@ -1,4 +1,8 @@
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot, Update
+from telegram.ext import ContextTypes
+
+from src.Voice2task.tg_services.message_utils.message_send_logic import edit_message, send_new_message
 from src.Voice2task.db_services.user_storage import UserStorage
 import logging
 
@@ -6,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async def send_main_menu(bot: Bot, chat_id: int, update: Update):
+async def send_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, like_new_message: True):
 
     user_storage = UserStorage()
     calendar_data = await user_storage.get_main_calendar(int(update.effective_user.id))
@@ -26,10 +30,24 @@ async def send_main_menu(bot: Bot, chat_id: int, update: Update):
         f"<b>{calendar_name}</b>" if calendar_name else "<b>не выбран</b>"
     )
 
-    await bot.send_message(
-        chat_id=chat_id,
-        text=f"Сейчас Ваш текущий основной календарь: {calendar_text}.",
-        parse_mode="HTML",
-        reply_markup=markup
-    )
+    if like_new_message:
+
+        await send_new_message(
+            update,
+            context,
+            text=f"Сейчас Ваш текущий основной календарь: {calendar_text}.",
+            parse_mode="HTML",
+            reply_markup=markup
+        )
+
+    else:
+
+        await edit_message(
+            update,
+            context,
+            text=f"Сейчас Ваш текущий основной календарь: {calendar_text}.",
+            parse_mode="HTML",
+            reply_markup=markup
+        )
+
     logger.info('отправлено меню')

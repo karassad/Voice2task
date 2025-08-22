@@ -92,7 +92,7 @@ class MainCalendarSetup:
                 context.user_data['main_calendar_id'] = calendar_info['id']
                 logger.info(f"ID календаря сохранен в контекст: {context.user_data.get('main_calendar_id')}")
 
-                await send_main_menu(context.bot, update.effective_chat.id, update)
+                await send_main_menu(update, context, False)
 
                 del context.user_data[f'calendar_hash_{hashed_cal_id}']
 

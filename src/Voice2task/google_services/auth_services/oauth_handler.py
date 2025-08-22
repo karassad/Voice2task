@@ -1,8 +1,11 @@
 import json
 import logging
 import secrets
+
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.Voice2task.tg_services.message_utils.message_scripts import AUTH_LINK
 from src.Voice2task.tg_services.message_utils.message_send_logic import send_smart_message
 from google_auth_oauthlib.flow import Flow
 from telegram import Update
@@ -39,11 +42,6 @@ class OauthHandler:
             scopes=self.scopes,
             redirect_uri=self.redirect_uri
         )
-        # flow = Flow.from_client_secrets_file(
-        #     client_secrets_file=self.client_secret,
-        #     scopes=self.scopes,
-        #     redirect_uri=self.redirect_uri
-        # )
 
         auth_url, _ = flow.authorization_url(
             prompt='consent',
@@ -55,7 +53,16 @@ class OauthHandler:
         oauth_sessions[state] = flow
         logger.info(f"Saved OAuth flow for state: {state}")
 
-        await send_smart_message(update=update, context=context, text='Пожалуйста, перейдите по следующей ссылке для авторизации: ' + auth_url, last_message=False, reply_markup=None)
+        message_text = AUTH_LINK.format(auth_url=auth_url)
+
+        await send_smart_message(
+            update=update,
+            context=context,
+            text=message_text,
+            parse_mode=ParseMode.HTML,
+            last_message=False,
+            reply_markup=None
+        )
 
     async def get_user_credentials(self, request: Request):
         '''

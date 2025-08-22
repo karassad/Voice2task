@@ -11,6 +11,9 @@ async def calendar_update_command(update: Update, context: ContextTypes.DEFAULT_
     Обрабатывает команду /calendar_update.
     Начинает процесс смены календаря пользователя.
     """
+    if update.callback_query:
+        await update.callback_query.answer()
+
     user_id = update.effective_user.id
     user_name = update.effective_user.first_name
     logger.info(f"Received /calendar_update command from user {user_id} ({user_name})")

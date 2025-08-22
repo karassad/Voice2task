@@ -123,12 +123,8 @@ class CalendarService:
                 logger.info(f"Добавлена кнопка для календаря: {calendar['summary']} (ID: {calendar_id}), хэш: {hashed_cal_id}")
             keyboard = InlineKeyboardMarkup(buttons)
 
-            if update.callback_query:
-                await edit_message(update, context, text="Выберите календарь:",
-                                   reply_markup=keyboard)
-            else:
-                 await send_new_message(update, context, text="Выберите календарь:",
-                                        reply_markup=keyboard)
+            await edit_message(update, context, text="Выберите календарь:",
+                               reply_markup=keyboard)
 
 
         except Exception as e:

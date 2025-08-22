@@ -1,9 +1,12 @@
 import json
 import logging
 
-from telegram import Update, Credentials
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.Voice2task.tg_services.tg_bot_markups.main_menu import send_main_menu
+from src.Voice2task.tg_services.message_utils.message_scripts import MEET_CREATED, EVENT_CREATED
 from src.Voice2task.db_services.user_storage import UserStorage
 from src.Voice2task.tg_services.message_utils.message_send_logic import send_new_message
 from src.Voice2task.google_services.google_calendar_services.calendar_service import CalendarService
@@ -67,11 +70,14 @@ class EventsHandler:
             event_link = event.get('htmlLink')
             summary = event_body.get('summary', 'Событие')
 
-            confirmation_message = (
-                f"✅ **Успешно!** Событие \"{summary}\" создано в вашем календаре.\n"
-                f"[Перейти к событию]({event_link})"
-            )
-            await send_new_message(update, context, confirmation_message)
+            if 'conferenceData' in event_body:
+                confirmation_message = MEET_CREATED.format(summary=summary, link=event_link)
+            else:
+                confirmation_message = EVENT_CREATED.format(summary=summary, link=event_link)
+
+            await send_new_message(update, context, confirmation_message, parse_mode=ParseMode.HTML)
+
+            await send_main_menu(update, context, True)
 
 
         except json.JSONDecodeError as e:

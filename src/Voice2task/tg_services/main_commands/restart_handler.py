@@ -15,6 +15,10 @@ async def restart_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     :param context:
     :return:
     '''
+
+    if update.callback_query:
+        await update.callback_query.answer()
+
     user_id = update.effective_user.id
     user_name = update.effective_user.first_name
     logger.info(f"Received /restart command from user {user_id} ({user_name})")
