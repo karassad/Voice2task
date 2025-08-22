@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 import uuid
 
@@ -8,6 +9,7 @@ class PromptsGenerator:
 
     def __init__(self):
         self.time_zone = 'Europe/Moscow'
+        self.prompts_dir = os.path.dirname(os.path.abspath(__file__))
 
     def _generate_date_context(self):
         '''
@@ -39,10 +41,16 @@ class PromptsGenerator:
 
         return '\n'.join(date_context)
 
+    def _load_prompt_template(self, filename):
+        file_path = os.path.join(self.prompts_dir, filename)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+
 
     def event_prompt(self):
 
         date_context = self._generate_date_context()
+        specific_instructions = self._load_prompt_template('specific_instructions_event.txt')
 
         system_prompt = f"""
                             Ты - умный ассистент, который преобразует текст пользователя в структурированное JSON-событие для Google Calendar.
@@ -57,6 +65,8 @@ class PromptsGenerator:
                             - Если ни время, ни дата не указаны, установи событие с 9:00 до 10:00 утра сегодняшнего дня.
                             - Всегда возвращай 'start' и 'end' как объекты с 'dateTime' в формате ISO 8601, включая часовой пояс.
                             - Часовой пояс для всех событий - '{self.time_zone}'.
+                            
+                            {specific_instructions}
     
                             Словарь временных интервалов для помощи в определении времени:
                             - Утро: с 6:00 до 12:00
@@ -91,6 +101,7 @@ class PromptsGenerator:
     def google_meet_prompt(self, google_meet_block: bool = False):
         date_context = self._generate_date_context()
         unic_id_for_google_meet = str(uuid.uuid4())
+        specific_instructions = self._load_prompt_template('specific_instructions_meet.txt')
 
         system_prompt = f"""
                                 Ты - умный ассистент, который преобразует текст пользователя в структурированное JSON-событие для Google Calendar. 
@@ -106,6 +117,8 @@ class PromptsGenerator:
                                 - Если ни время, ни дата не указаны, установи событие с 9:00 до 10:00 утра сегодняшнего дня.
                                 - Всегда возвращай 'start' и 'end' как объекты с 'dateTime' в формате ISO 8601, включая часовой пояс.
                                 - Часовой пояс для всех событий - '{self.time_zone}'.
+                                
+                                {specific_instructions}
 
                                 Словарь временных интервалов для помощи в определении времени:
                                 - Утро: с 6:00 до 12:00
