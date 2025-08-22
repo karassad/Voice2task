@@ -117,6 +117,13 @@ async def oauth_callback(request: Request):
 
                 bot_app = request.app.telegram_app_instance
 
+                #сохраняем токены в контекст, чтобы в будущем создать событие на их основе
+                if user_id in bot_app.user_data:
+                    bot_app.user_data[user_id]['token'] = credentials_dict
+                    logger.info(f"Credentials saved successfully to context for user {user_id}.")
+                else:
+                    logger.warning(f"No active context found for user {user_id}. Data is only in DB.")
+
                 user_data = await user_storage.get_user_data(user_id)
                 if not user_data:
                     logger.error(f"User data for {user_id} not found after auth.")

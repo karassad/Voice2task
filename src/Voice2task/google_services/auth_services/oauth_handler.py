@@ -1,3 +1,4 @@
+import json
 import logging
 import secrets
 from telegram.ext import ContextTypes
@@ -31,12 +32,18 @@ class OauthHandler:
         await self.user_storage.update_user_data(user_id, {
             'state': state})
 
+        client_config = json.loads(self.client_secret)  # self.client_secret — это строка JSON из переменной окружения
 
-        flow = Flow.from_client_secrets_file(
-            client_secrets_file=self.client_secret,
+        flow = Flow.from_client_config(
+            client_config=client_config,
             scopes=self.scopes,
             redirect_uri=self.redirect_uri
         )
+        # flow = Flow.from_client_secrets_file(
+        #     client_secrets_file=self.client_secret,
+        #     scopes=self.scopes,
+        #     redirect_uri=self.redirect_uri
+        # )
 
         auth_url, _ = flow.authorization_url(
             prompt='consent',
@@ -107,21 +114,6 @@ class OauthHandler:
             except Exception as e:
                 logger.error(f"Error verify state for user {doc.id}: {e}", exc_info=True)
         return None
-
-    # async def oauth_success(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #     """
-    #         Вызывается после успешного завершения авторизации.
-    #         Запускает процесс выбора основного календаря.
-    #     """
-    #     user_id = update.effective_user.id
-    #     logger.info(f"OAuth success for user {user_id}. Starting main calendar setup.")
-    #     main_calendar_setup = MainCalendarSetup()
-    #     try:
-    #         await main_calendar_setup.start_calendar_selection_flow(update, context)
-    #     except Exception as e:
-    #         logger.error(f"Error starting main calendar setup for user {user_id}: {e}", exc_info=True)
-    #
-
 
 
 

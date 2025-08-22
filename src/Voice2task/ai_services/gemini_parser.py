@@ -6,6 +6,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.ext import ConversationHandler
 
+from src.Voice2task.google_services.events_services.events_handler import EventsHandler
 from src.Voice2task.ai_services.prompts_generator import PromptsGenerator
 from src.Voice2task.config import GEMINI_API_KEY
 from src.Voice2task.tg_services.message_utils.message_send_logic import send_new_message
@@ -17,6 +18,7 @@ class GeminiParser:
 
     def __init__(self):
         self.gemini_api_key = GEMINI_API_KEY
+        self.events_handler = EventsHandler()
 
 
     async def parse_user_request(self, update: Update, context: ContextTypes.DEFAULT_TYPE, text: str):
@@ -54,7 +56,10 @@ class GeminiParser:
             logger.info(f"Response from Gemini API: {response.text}")
             res = response.text
 
-            await send_new_message(update, context, f"{res}")
+            if res.startswith('```json'):
+                res = res.replace('```json', '').replace('```', '').strip()
+
+            await self.events_handler.create_event(update, context, res)
 
             return ConversationHandler.END
 

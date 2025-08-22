@@ -24,7 +24,7 @@ class CalendarService:
     def __init__(self):
         self.user_storage = UserStorage()
 
-    async def _create_calendar_service(self, user_id: str):
+    async def create_calendar_service(self, user_id: str):
         """
         Метод для получения аутентифицированного сервиса Google Calendar.
         Инкапсулирует логику получения учетных данных и создания объекта CalendarService.
@@ -58,7 +58,7 @@ class CalendarService:
                                 'client_secret': creds_object.client_secret,
                                 'scopes': creds_object.scopes
                             }
-                            await self.user_storage.set_user_data(int(user_id), updated_credentials_dict)
+                            await self.user_storage.update_user_data(int(user_id), updated_credentials_dict)
                         else:
                             raise ValueError("Токен невалиден после попытки обновления.")
                     except RefreshError as e:
@@ -87,7 +87,7 @@ class CalendarService:
             return None
 
     async def get_calendars_list(self, user_id: str):
-        calendar_service = await self._create_calendar_service(user_id)
+        calendar_service = await self.create_calendar_service(user_id)
         if not calendar_service:
             logger.error(f"Не удалось создать сервис календаря для пользователя {user_id}.")
 
