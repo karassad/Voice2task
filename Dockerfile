@@ -8,6 +8,7 @@ COPY requirements.txt .
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y ffmpeg
 
 # Копируем весь исходный код проекта в рабочую директорию.
 # Это включает все папки и файлы, видимые на вашем скриншоте.
