@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  voice2task_bot:
+    # Используем Dockerfile из текущей директории для сборки образа
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Назначаем имя контейнеру
+    container_name: voice2task_bot
+    # Если вы используете переменные окружения из .env
+    env_file:
+      - .env
+    # Пробрасываем порты: HOST:CONTAINER
+    ports:
+      - "8080:8080"
+    # Перезапускать контейнер в случае сбоя
+    restart: always
+    # Монтируем тома для горячей перезагрузки
+    # Это позволяет видеть изменения в коде без пересборки образа
+    volumes:
+      - .:/app

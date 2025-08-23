@@ -1,0 +1,34 @@
+# Временные файлы Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Логи и базы данных
+*.log
+*.db
+*.sqlite
+
+# Среды разработки и локальные настройки
+.vscode/
+.venv/
+.env
+
+# Голосовые файлы
+voice.wav
+voice.ogg
+
+# Файлы аутентификации
+user_settings.json
+token.json
+credentials.json
+firebase-service-account.json
+
+# Архивы и пакеты
+*.zip
+*.whl
+*.tar.gz
+
+# Модели
+models/
+ggml-*.bin
