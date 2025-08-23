@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем весь исходный код проекта в рабочую директорию.
 # Это включает все папки и файлы, видимые на вашем скриншоте.
 COPY . .
-
+ENV PYTHONPATH=/app/src/Voice2task
 # Открываем порт, на котором работает веб-сервер
 EXPOSE 8080
 
