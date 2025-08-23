@@ -51,7 +51,7 @@ async def lifespan(fastapi_app: FastAPI):
 
 fastapi_app = FastAPI(lifespan=lifespan)
 
-@fastapi_app.post('/webhook_dev')
+@fastapi_app.post('/webhook')
 async def webhook(request: Request):
     try:
         update_data = await request.json()
